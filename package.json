@@ -6,9 +6,18 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "check-types": "turbo run check-types",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:reset": "docker compose down -v && docker compose up -d",
+    "db:migrate": "pnpm --filter ./packages/db exec prisma migrate dev",
+    "db:studio": "pnpm --filter ./packages/db exec prisma studio",
+    "db:generate": "pnpm --filter ./packages/db exec prisma generate",
+    "db:typecheck": "pnpm --filter ./packages/db exec tsc --noEmit",
+    "web:dev": "pnpm --filter ./apps/web dev"
   },
   "devDependencies": {
+    "@types/node": "^22.15.3",
     "prettier": "^3.7.4",
     "turbo": "^2.9.6",
     "typescript": "5.9.2"
