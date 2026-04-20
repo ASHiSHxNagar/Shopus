@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@repo/api/*": ["packages/api/src/*"],
+			"@repo/db/*": ["packages/db/*"],
+			"@repo/web/*": ["apps/web/*"]
+		}
+	}
+}

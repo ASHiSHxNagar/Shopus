@@ -3,15 +3,26 @@
 import { trpc } from "../lib/trpc";
 
 export default function Page() {
-  const { data, isLoading, error } = trpc.user.getAll.useQuery();
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  const usersQuery = trpc.user.getAll.useQuery();
+const sessionQuery = trpc.user.getMe.useQuery();
 
-  return (
-    <div>
-      <h1>Users</h1>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-    </div>
-  );
+if (usersQuery.isLoading || sessionQuery.isLoading) {
+  return <p>Loading...</p>;
+}
+
+if (usersQuery.error) {
+  return <p>Error: {usersQuery.error.message}</p>;
+}
+
+if (sessionQuery.error) {
+  return <p>Error: {sessionQuery.error.message}</p>;
+}
+
+return (
+  <>
+    <pre>{JSON.stringify(usersQuery.data, null, 2)}</pre>
+    <pre>{JSON.stringify(sessionQuery.data, null, 2)}</pre>
+  </>
+);
 }
