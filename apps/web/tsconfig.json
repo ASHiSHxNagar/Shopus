@@ -3,6 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@/*": ["./*"],
+      "@components/*": ["./components/*"],
       "@repo/api/*": ["../../packages/api/src/*"],
       "@repo/db/*": ["../../packages/db/*"],
       "@repo/web/*": ["./*"]

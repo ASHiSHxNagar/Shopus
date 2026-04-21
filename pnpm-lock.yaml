@@ -81,6 +81,9 @@ importers:
       '@trpc/server':
         specifier: ^11.16.0
         version: 11.16.0(typescript@5.9.2)
+      bcryptjs:
+        specifier: ^3.0.3
+        version: 3.0.3
       lucide-react:
         specifier: ^1.8.0
         version: 1.8.0(react@19.2.0)
@@ -89,7 +92,7 @@ importers:
         version: 16.2.0(@babel/core@7.29.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       next-auth:
         specifier: ^4.24.14
-        version: 4.24.14(next@16.2.0(@babel/core@7.29.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 4.24.14(next@16.2.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       postcss:
         specifier: ^8.5.10
         version: 8.5.10
@@ -138,7 +141,7 @@ importers:
         version: 11.16.0(typescript@5.9.2)
       next-auth:
         specifier: ^4.24.14
-        version: 4.24.14(next@16.2.0(@babel/core@7.29.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 4.24.14(next@16.2.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -2176,6 +2179,10 @@ packages:
   baseline-browser-mapping@2.10.8:
     resolution: {integrity: sha512-PCLz/LXGBsNTErbtB6i5u4eLpHeMfi93aUv5duMmj6caNu6IphS4q6UevDnL36sZQv9lrP11dbPKGMaXPwMKfQ==}
     engines: {node: '>=6.0.0'}
+
+  bcryptjs@3.0.3:
+    resolution: {integrity: sha512-GlF5wPWnSa/X5LKM1o0wz0suXIINz1iHRLvTS+sLyi7XPbe5ycmYI3DlZqVGZZtDgl4DmasFg7gOB3JYbphV5g==}
+    hasBin: true
 
   better-result@2.8.2:
     resolution: {integrity: sha512-YOf0VSj5nUPI27doTtXF+BBnsiRq3qY7avHqfIWnppxTLGyvkLq1QV2RTxkwoZwJ60ywLfZ0raFF4J/G886i7A==}
@@ -6462,6 +6469,8 @@ snapshots:
 
   baseline-browser-mapping@2.10.8: {}
 
+  bcryptjs@3.0.3: {}
+
   better-result@2.8.2: {}
 
   body-parser@2.2.2:
@@ -7851,7 +7860,7 @@ snapshots:
 
   negotiator@1.0.0: {}
 
-  next-auth@4.24.14(next@16.2.0(@babel/core@7.29.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+  next-auth@4.24.14(next@16.2.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
       '@babel/runtime': 7.29.2
       '@panva/hkdf': 1.2.1
