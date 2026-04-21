@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { trpc } from "../lib/trpc";
+import { trpc } from "../../lib/trpc";
 
 export default function Page() {
   const { data: session, status } = useSession();

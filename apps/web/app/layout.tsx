@@ -5,6 +5,7 @@ import "./globals.css";
 import { Providers } from "../lib/providers";
 import { Geist } from "next/font/google";
 import { cn } from "@repo/ui/lib/utils";
+import { Navbar } from "@/components/layout/navbar";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -30,7 +31,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );
