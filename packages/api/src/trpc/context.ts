@@ -1,8 +1,12 @@
-import { prisma } from "../../../db/client";
-
+import { prisma } from "@repo/db/client";
+import { getAuthSession } from "@repo/web/lib/auth";
 export async function createTRPCContext() {
+    const session = await getAuthSession();
+
+
   return {
     prisma,
+    session,
   };
 }
 

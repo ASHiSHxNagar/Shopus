@@ -5,4 +5,7 @@ export const userRouter = router({
     const users = await ctx.prisma.user.findMany();
     return users;
   }),
+  getMe: publicProcedure.query(({ ctx }) => {
+  return ctx.session;
+}),
 });
