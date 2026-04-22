@@ -1,138 +1,132 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
+import { PasswordInput } from "@/components/ui/password-input";
+import { GoogleIcon } from "@/components/icons/google-icon";
 
-export function LoginForm() {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+export  function LoginForm() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [role, setRole] = useState<"SELLER" | "ADMIN">("SELLER");
 
   const handleLogin = async () => {
-    setLoading(true);
-    setError("");
+  setLoading(true);
+  setError("");
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+  const res = await signIn("credentials", {
+    email,
+    password,
+    redirect: false,
+  });
 
+  if (res?.error) {
     setLoading(false);
+    setError("Invalid credentials");
+    return;
+  }
 
-    if (res?.error) {
-      setError("Invalid email or password");
-    } else {
-      window.location.href = "/";
-    }
-  };
+  // 🔥 session निकाल
+  const session = await getSession();
 
+  setLoading(false);
+
+  const role = session?.user?.role;
+
+  if (role === "ADMIN") {
+    window.location.href = "/admin";
+  } else {
+    window.location.href = "/dashboard";
+  }
+};
   return (
     <div className="min-h-screen flex bg-black text-white">
 
-      {/* LEFT SIDE (branding - desktop only) */}
-      <div className="hidden lg:flex w-1/2 relative items-center justify-center bg-gradient-to-br from-blue-900/30 to-black">
-
-        {/* Glow */}
-        <div className="absolute w-[500px] h-[500px] bg-blue-500/20 blur-[120px] rounded-full" />
+      {/* LEFT */}
+      <div className="hidden lg:flex w-1/2 relative items-center justify-center bg-linear-to-br from-blue-900/30 to-black">
+        <div className="absolute w-125 h-125 bg-blue-500/20 blur-[120px] rounded-full" />
 
         <div className="relative z-10 text-center max-w-md px-10 space-y-6">
-          <h1 className="text-4xl font-bold leading-tight">
-            Build Your Wholesale Empire 🚀
+          <h1 className="text-4xl font-bold">
+            Welcome Back 👋
           </h1>
-
-          <p className="text-zinc-400 text-lg">
-            Manage products, suppliers, and orders — all in one place.
+          <p className="text-zinc-400">
+            Login and continue your journey
           </p>
         </div>
       </div>
 
-      {/* RIGHT SIDE */}
-      <div className="flex flex-1 items-center justify-center px-4 my-4">
+      {/* RIGHT */}
+      <div className="flex flex-1 items-center justify-center px-4">
 
         <div className="w-full max-w-md backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl space-y-6">
 
-          {/* TITLE */}
-          <div className="space-y-1 text-center">
-            <h2 className="text-3xl font-semibold">Welcome back</h2>
-            <p className="text-zinc-400 text-sm">
-              Login to continue
-            </p>
-          </div>
+          <h2 className="text-3xl text-center font-semibold">
+            Login
+          </h2>
 
-          {/* ERROR */}
           {error && (
-            <p className="text-red-400 text-sm text-center">
-              {error}
-            </p>
+            <p className="text-red-400 text-center text-sm">{error}</p>
           )}
+          <div className="flex bg-white/5 border border-white/10 rounded-lg p-1">
+  <button
+    onClick={() => setRole("SELLER")}
+    className={role === "SELLER" ? "bg-blue-600 flex-1" : "flex-1"}
+  >
+    Seller
+  </button>
 
-          {/* EMAIL */}
-          <div className="space-y-2">
-            <label className="text-sm text-zinc-300">Email</label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 pl-5 pr-4 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
-          </div>
+  <button
+    onClick={() => setRole("ADMIN")}
+    className={role === "ADMIN" ? "bg-blue-600 flex-1" : "flex-1"}
+  >
+    Admin
+  </button>
+</div>
 
-          {/* PASSWORD */}
-          <div className="space-y-2">
-            <label className="text-sm text-zinc-300">Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-12 pl-5 pr-4 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
-          </div>
+          <input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full h-12 px-4 rounded-lg bg-white/5 border border-white/10 focus:ring-2 focus:ring-blue-500"
+          />
 
-          {/* OPTIONS */}
-          <div className="flex items-center justify-between text-sm text-zinc-400">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="accent-blue-500" />
-              Remember me
-            </label>
+          <PasswordInput
+            value={password}
+            onChange={setPassword}
+            placeholder="Password"
+          />
 
-            <span className="hover:text-blue-400 cursor-pointer transition">
-              Forgot password?
-            </span>
-          </div>
-
-          {/* BUTTON */}
+          {/* LOGIN BUTTON */}
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="w-full h-12 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 font-medium cursor-pointer hover:opacity-90 transition shadow-lg shadow-blue-500/20"
+            className="w-full h-12 rounded-lg bg-linear-to-r from-blue-500 to-cyan-500 hover:opacity-90 transition"
           >
-            {loading ? "Logging in..." : "Log In"}
+            {loading ? "Logging in..." : "Login"}
           </button>
 
-          {/* DIVIDER */}
-          <div className="flex items-center gap-3 text-zinc-500 text-sm">
-            <div className="h-px bg-zinc-700 flex-1" />
-            OR
-            <div className="h-px bg-zinc-700 flex-1" />
-          </div>
-
-          {/* GOOGLE BUTTON */}
-          <button className="w-full h-12 rounded-lg border border-white/10 cursor-pointer hover:bg-white/5 transition">
-            Continue with Google
-          </button>
-
-          {/* FOOTER */}
-          <p className="text-center text-sm text-zinc-500">
+          {/* GOOGLE LOGIN */}
+         <button
+onClick={() => {
+  localStorage.setItem("selectedRole", role);
+  signIn("google", { callbackUrl: "/auth/callback" });
+}}
+  className="w-full cursor-pointer h-12 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition flex items-center justify-center gap-2"
+>
+  <GoogleIcon />
+  Continue with Google
+</button>
+          {/* REGISTER */}
+          <p className="text-center text-sm text-zinc-400">
             Don’t have an account?{" "}
             <span
-              className="text-blue-400 cursor-pointer hover:underline"
+              className="text-blue-400 cursor-pointer"
               onClick={() => (window.location.href = "/auth/register")}
             >
-              Sign up
+              Register
             </span>
           </p>
 

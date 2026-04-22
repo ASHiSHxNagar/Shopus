@@ -1,60 +1,96 @@
-import NextAuth, { type AuthOptions } from "next-auth";
+import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-
+import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@repo/db/client";
 import bcrypt from "bcryptjs";
 
-export const authOptions: AuthOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+
     CredentialsProvider({
       name: "Credentials",
-      credentials: {
-        email: {},
-        password: {},
+      credentials: { email: {}, password: {} },
+
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!user || !user.password) return null;
+
+        const valid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+
+        if (!valid) return null;
+
+        return {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        };
       },
-async authorize(credentials) {
-  // 1️⃣ basic check
-  if (!credentials?.email || !credentials?.password) {
-    return null;
-  }
-
-  // 2️⃣ DB se user lao
-  const user = await prisma.user.findUnique({
-    where: {
-      email: credentials.email,
-    },
-  });
-
-  if (!user) {
-    return null;
-  }
-
-  // 3️⃣ password compare
-  const isValid = await bcrypt.compare(
-    credentials.password,
-    user.password
-  );
-
-  if (!isValid) {
-    return null;
-  }
-
-  // 4️⃣ return user (VERY IMPORTANT)
-  return {
-    id: user.id,
-    email: user.email,
-  };
-}
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/auth/login",
+
+  session: { strategy: "jwt" },
+
+  callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email! },
+        });
+
+        if (!existingUser) {
+          await prisma.user.create({
+            data: {
+              email: user.email!,
+              name: user.name || "",
+              password: "",
+              role: "SELLER",
+            },
+          });
+        }
+      }
+      return true;
+    },
+
+    async jwt({ token }) {
+      if (token.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email },
+        });
+
+        if (dbUser) {
+          token.role = dbUser.role;
+          token.id = dbUser.id;
+        }
+      }
+
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        if (token.role) {
+          session.user.role = token.role;
+        }
+        if (token.id) {
+          session.user.id = token.id;
+        }
+      }
+      return session;
+    },
   },
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };

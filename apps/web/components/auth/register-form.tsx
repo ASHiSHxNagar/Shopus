@@ -1,24 +1,36 @@
 "use client";
 
 import { useState } from "react";
+import { PasswordInput } from "@/components/ui/password-input";
+import { signIn } from "next-auth/react";
+import { GoogleIcon } from "@/components/icons/google-icon";
 
 export function RegisterForm() {
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [confirm, setConfirm] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [role, setRole] = useState<"SELLER" | "ADMIN">("SELLER");
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  
 
   const handleRegister = async () => {
     setError("");
+    setLoading(true);
 
-    if (password !== confirm) {
-      setError("Passwords do not match");
+    // 🔥 ADMIN redirect
+    if (role === "ADMIN") {
+      window.location.href = "/admin/register";
       return;
     }
 
-    setLoading(true);
+    if (password !== confirm) {
+  setError("Passwords do not match");
+  return;
+}
 
     try {
       const res = await fetch("/api/register", {
@@ -27,7 +39,7 @@ export function RegisterForm() {
           name,
           email,
           password,
-          confirmPassword: confirm,
+          role,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -53,7 +65,6 @@ export function RegisterForm() {
       {/* LEFT SIDE */}
       <div className="hidden lg:flex w-1/2 relative items-center justify-center bg-gradient-to-br from-blue-900/30 to-black">
 
-        {/* glow */}
         <div className="absolute w-[500px] h-[500px] bg-blue-500/20 blur-[120px] rounded-full" />
 
         <div className="relative z-10 text-center max-w-md px-10 space-y-6">
@@ -97,7 +108,7 @@ export function RegisterForm() {
               placeholder="Enter your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full h-12 pl-5 pr-4 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-12 pl-5 pr-4 rounded-lg bg-white/5 border border-white/10 focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -109,32 +120,53 @@ export function RegisterForm() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 pl-5 pr-4 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-12 pl-5 pr-4 rounded-lg bg-white/5 border border-white/10 focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* PASSWORD */}
-          <div className="space-y-2">
-            <label className="text-sm text-zinc-300">Password</label>
-            <input
-              type="password"
-              placeholder="Create password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-12 pl-5 pr-4 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <PasswordInput
+  value={password}
+  onChange={setPassword}
+  placeholder="Create password"
+/>
+          {/* CONFIRM PASSWORD */}
 
-          {/* CONFIRM */}
+<PasswordInput
+  value={confirm}
+  onChange={setConfirm}
+  placeholder="Confirm password"
+/>
+
+          {/* 🔥 ROLE SELECT (NEW) */}
           <div className="space-y-2">
-            <label className="text-sm text-zinc-300">Confirm Password</label>
-            <input
-              type="password"
-              placeholder="Confirm password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              className="w-full h-12 pl-5 pr-4 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <label className="text-sm text-zinc-300">Account Type</label>
+
+            <div className="flex bg-white/5 border border-white/10 rounded-lg p-1">
+              <button
+                type="button"
+                onClick={() => setRole("SELLER")}
+                className={`flex-1 py-2 rounded-md text-sm ${
+                  role === "SELLER"
+                    ? "bg-blue-600 text-white"
+                    : "text-zinc-400"
+                }`}
+              >
+                Seller
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRole("ADMIN")}
+                className={`flex-1 py-2 rounded-md text-sm ${
+                  role === "ADMIN"
+                    ? "bg-blue-600 text-white"
+                    : "text-zinc-400"
+                }`}
+              >
+                Admin
+              </button>
+            </div>
           </div>
 
           {/* BUTTON */}
@@ -145,6 +177,17 @@ export function RegisterForm() {
           >
             {loading ? "Creating..." : "Create Account"}
           </button>
+
+          <button
+  onClick={() => signIn("google", {
+  callbackUrl: "/auth/callback",
+})}
+  className="w-full h-12 cursor-pointer rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition flex items-center justify-center gap-2"
+>
+  <GoogleIcon />
+  Continue with Google
+</button>
+
 
           {/* LOGIN LINK */}
           <p className="text-center text-sm text-zinc-500">

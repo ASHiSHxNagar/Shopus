@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { name, email, password, confirmPassword } = body;
+  const { name, email, password, confirmPassword, role } = body;
 
   // 1️⃣ basic validation
   if (!email || !password || !confirmPassword) {
@@ -24,6 +24,10 @@ export async function POST(req: Request) {
     return new Response("User already exists", { status: 400 });
   }
 
+  if (role !== "SELLER" && role !== "ADMIN") {
+  return new Response("Invalid role", { status: 400 });
+}
+
   // 4️⃣ hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -33,6 +37,7 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
+      role: role || "SELLER",
     },
   });
 

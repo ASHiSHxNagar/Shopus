@@ -1,33 +1,40 @@
-"use client";
+import Link from "next/link";
 
-import { useSession } from "next-auth/react";
-import { trpc } from "../../lib/trpc";
-
-export default function Page() {
-  const { data: session, status } = useSession();
-  const usersQuery = trpc.user.getAll.useQuery();
-  const sessionQuery = trpc.user.getMe.useQuery();
-
-  if (usersQuery.isLoading || sessionQuery.isLoading || status === "loading") {
-    return <p>Loading...</p>;
-  }
-
-  if (usersQuery.error) {
-    return <p>Error: {usersQuery.error.message}</p>;
-  }
-
-  if (sessionQuery.error) {
-    return <p>Error: {sessionQuery.error.message}</p>;
-  }
-
+export default function HomePage() {
   return (
-    <>
-      <pre>{JSON.stringify(usersQuery.data, null, 2)}</pre>
-      <pre>{JSON.stringify(sessionQuery.data, null, 2)}</pre>
-      <div>
-        <h1>session logged here </h1>
-        <pre>{JSON.stringify(session, null, 2)}</pre>
+    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6">
+
+      {/* Hero */}
+      <h1 className="text-4xl md:text-6xl font-bold text-center max-w-3xl leading-tight">
+        Build Your Wholesale Business
+        <span className="text-blue-500"> Faster</span>
+      </h1>
+
+      {/* Subtext */}
+      <p className="mt-6 text-zinc-400 text-center max-w-xl">
+        Manage products, orders, and customers in one powerful SaaS platform.
+        Designed for modern wholesale businesses.
+      </p>
+
+      {/* CTA */}
+      <div className="mt-10 flex gap-4">
+
+        <Link
+          href="/auth/register"
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-md font-medium"
+        >
+          Get Started
+        </Link>
+
+        <Link
+          href="/auth/login"
+          className="px-6 py-3 border border-zinc-700 hover:border-blue-500 rounded-md"
+        >
+          Login
+        </Link>
+
       </div>
-    </>
+
+    </div>
   );
 }
