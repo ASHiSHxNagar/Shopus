@@ -1,24 +1,24 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 type Role = "SELLER" | "ADMIN";
 
 function getRoleRedirect(role: Role): string {
-  return role === "ADMIN" ? "http://localhost:3001/" : "/";
+  return role === "SELLER" ? "http://localhost:3000/" : "/";
 }
 
 export default function AuthCallback() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const run = async () => {
       if (status === "authenticated") {
         const intendedRole =
-          searchParams.get("intent") === "ADMIN" ? "ADMIN" : "SELLER";
+          searchParams.get("intent") === "SELLER" ? "SELLER" : "ADMIN";
 
         const response = await fetch("/api/auth/google-bootstrap", {
           method: "POST",
@@ -34,9 +34,9 @@ export default function AuthCallback() {
         }
 
         const result = (await response.json()) as { role?: Role };
-        const resolvedRole: Role = result.role === "ADMIN" ? "ADMIN" : "SELLER";
+        const role: Role = result.role === "SELLER" ? "SELLER" : "ADMIN";
 
-        window.location.href = getRoleRedirect(resolvedRole);
+        window.location.href = getRoleRedirect(role);
         return;
       }
 
@@ -46,7 +46,7 @@ export default function AuthCallback() {
     };
 
     run();
-  }, [searchParams, session?.user?.email, status]);
+  }, [searchParams, status]);
 
-  return <div className="text-white">Setting up...</div>;
+  return <div className="text-white p-8">Setting up...</div>;
 }

@@ -12,11 +12,9 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-
     CredentialsProvider({
       name: "Credentials",
       credentials: { email: {}, password: {}, portal: {} },
-
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
@@ -26,11 +24,7 @@ export const authOptions: NextAuthOptions = {
 
         if (!user || !user.password) return null;
 
-        const valid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-
+        const valid = await bcrypt.compare(credentials.password, user.password);
         if (!valid) return null;
 
         const requestedPortal = credentials.portal as PortalRole | undefined;
@@ -46,14 +40,11 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-
   session: { strategy: "jwt" },
-
   callbacks: {
     async signIn() {
       return true;
     },
-
     async jwt({ token }) {
       if (token.email) {
         const dbUser = await prisma.user.findUnique({
@@ -68,7 +59,6 @@ export const authOptions: NextAuthOptions = {
 
       return token;
     },
-
     async session({ session, token }) {
       if (session.user) {
         if (token.role) {

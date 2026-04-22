@@ -22,6 +22,6 @@
     "next-env.d.ts",
     "next.config.js",
     ".next/types/**/*.ts"
-  ],
+, "components/auth/login-formtsx"  ],
   "exclude": ["node_modules"]
 }
